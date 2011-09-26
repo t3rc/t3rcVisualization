@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Category name field is used to match definition with correct Java class, do not alter them.
+-->
+<definitions>
+    <category name="Application">
+        <template id="1">Used {name} for {duration}.</template>
+    </category>
+
+    <category name="Browsing">
+        <template id="1">Page visit {url}</template>
+    </category>
+
+    <category name="Calendar">
+        <template id="1">Appointment {description} (at {place}), duration {duration}.</template>
+    </category>
+    
+    <category name="Charger">        
+        <template id="1">Battery level changed to {status}%.</template>
+		<template id="2">Charger {status}.</template>
+		<template id="3">Device {status}.</template>
+		<template id="4">Charging {status}.</template>
+    </category>
+    
+    <category name="Friend">
+		<template id="1">Call from {name} {lastname} ({phone}).</template>        
+        <template id="2">Unanswered call from {name} {lastname} ({phone}).</template>		
+        <template id="3">Call to {name} {lastname} ({phone}).</template>
+        <template id="4">Attempted call to {name} {lastname} ({phone}).</template>		
+		<template id="5">Message from {name} {lastname} ({phone})</template>			
+		<template id="6">Message to {name} {lastname} ({phone})</template>		
+    </category>
+    
+    <category name="Messaging">
+		<template id="1">Message from {name} {lastname} ({phone})</template>	
+		<template id="2">Message to {name} {lastname} ({phone})</template>		
+    </category>
+
+    <category name="Music">
+        <template id="1">Listened to music {artist} ({track}), {duration}</template>
+    </category>
+	
+    <category name="Phone">
+		<template id="1">Call from {name} {lastname} ({phone}), duration: {duration}.</template>        
+        <template id="2">Unanswered call from {name} {lastname} ({phone}).</template>		
+        <template id="3">Call to {name} {lastname} ({phone}), duration: {duration}.</template>
+        <template id="4">Attempted call to {name} {lastname} ({phone}).</template>		
+    </category>
+    
+    <category name="Place">
+        <template id="1">My location: {address}</template>
+    </category>
+    
+    <category name="Profile">
+        <template id="1">Changed phone profile to {name} ({type}).</template>
+    </category>
+    
+</definitions>
