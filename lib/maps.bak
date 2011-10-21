@@ -16,24 +16,11 @@
   	var markers = [];
   	var infoWindows = [];
   	var heat_infoWindows = [];
-  	var user_points = [];
   	
     var points = [];
   	var heat_points = [];
-  	var markersArray = [];
+  	
   	var ddate = [];
-	
-	var homeplaces = [
-	['22, 25, 30', 60.1876808, 24.8365655, 99999],
-	['26', 60.1884519, 24.8349674, 99999],
-	['27, 29', 60.1876879, 24.8347394, 99999],
-	['28', 60.2374682, 24.8207472, 99999],
-	['23, 50', 60.1883760, 24.8379305, 99999],
-	['55', 60.1696449, 24.7272059, 99999],
-	['42', 60.1935415, 24.9594662, 99999],
-	['Innopoli 2', 60.185852, 24.8128913, 99999],
-	['Kielikeskus', 60.1867395, 24.8303378, 99999]
-	]
 	
 	var _object = {"dates":
 	[{	"date":"",
@@ -52,29 +39,15 @@
 		}]	
 	}]
 	};
-	
-	var users = {"users":
-                    [{ "userid" : "",
-                       "location" : 
-                            [{ "latLong":""
-                            }]
-                    }] 
-                };
    	var poly;
-   	var individual = false;
     
   	var markerClusterer;
 	var imageUrl = 'http://chart.apis.google.com/chart?cht=mm&chs=24x32&chco=FFFFFF,008CFF,000000&ext=.png';  
-	//var imageUrl = 'http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld=FFFFFF,008CFF,000000&ext=.png';
-	
   	var imageUrlOrange = 'http://chart.apis.google.com/chart?cht=mm&chs=24x32&chco=FF8040,FF8040,000000&ext=.png';  
   	var imageUrlRed = 'http://chart.apis.google.com/chart?cht=mm&chs=24x32&chco=FF0000,FF0000,000000&ext=.png'; 
 	
 	var iDate = 0;
 	var iCat = 0;
-				
-	
-   google.load("visualization", "1", {packages:["corechart"]});
 
 				     
    function initializeMashUpMap () { 
@@ -85,6 +58,7 @@
         	var myOptions = {
             zoom: 15,
             center: myLatlng,
+			scrollwheel: false,
             panControl : false,
             zoomCotrol : true,
             zoomControlOptions : { style : google.maps.ZoomControlStyle.SMALL },
@@ -103,7 +77,6 @@
           //poly.setMap(map);
         
           initializeTimeplot();
-		  setHomes(map, homeplaces);
           
           $("#my-timeplot").bind("plotclick", function(event, pos, item){
                         
@@ -176,15 +149,16 @@ function display_apps(tim)
                                 a["nr_events"] = 1;
                                 apps.push(a);
                             }
-                           
                             
                         }
                         
+                        console.debug("aaaa");
                         console.debug(apps);
                         
                         for(var y=0; y < apps.length; y++)
                         {
                             hs += "<h3><a href='#'>"+apps[y].name+" <span class='anumber'>"+apps[y].nr_events+"</span></a></h3>";
+                            //hs += "<h3><a href='#'>"+apps[y].name+"</a></h3>";
                             hs += "<div>";
                             for (var z=0; z < apps[y].details.length; z++)
                             {
@@ -243,24 +217,13 @@ function AddDescriptionToInfoWindow(i, contentHTML)
 	heat_infoWindows[i] = heat_infoWindows[i] + "<br/>" + contentHTML;
 }
  
-function clearMarkersFromMap()
-{
-    for (i in markers) {
-      markers[i].setMap(null);
-    }
-
-} 
-
- 
 // Display Mash-up map with data filtered
 function addMarkersFromXML(xml) {
 
     
-   clearMarkersFromMap();
-   
-        //clear marker cluster 
-    	if (markerClusterer) 
-    			 markerClusterer.clearMarkers();
+		//clear marker cluster 
+		if (markerClusterer) 
+			 markerClusterer.clearMarkers();
 		
     var current_selected_period = zokemDateObject(document.dateRange);
 
@@ -269,7 +232,6 @@ function addMarkersFromXML(xml) {
 	var time = null;
 	var address = null;
 	var category = null;
-	var usr = null;
 	
 		
 	var latLng  =  new google.maps.LatLng(60.1698, 24.9382);
@@ -283,7 +245,6 @@ function addMarkersFromXML(xml) {
     addresses = [];
     points = [];
     heat_points = [];
-    user_points = [];
     heat_infoWindows = [];
     infoWindows = [];
     path = poly.getPath();
@@ -304,128 +265,266 @@ function addMarkersFromXML(xml) {
 	iDate = 0;
 	iCat = 0;
 	$(xml).find("event").each(function(){
+           
+        var app_name = "";
+     	var app_duration = -1;
 
-		lat = $(this).attr("lat");
-		lon = $(this).attr("lon");
-		time = $(this).attr("time");
-		usr = $(this).attr("uid");
+    
+        var htmlString = "<br/>";
+            //the api has oter format for location and the rest of
+            //categories
+		if (document.selectedCategory == "location")
+			{
+				//edited with category variable
+				category = location;
+				//
+				lat = $(this).attr("lat");
+				lon = $(this).attr("lon");
+				time = $(this).attr("time");
+				htmlString += "<span class='event_time'>"+  time + "</span><br/><br/>";
+			}
+		else
+			{
+				lat = $(this).children("latitude").text();
+				lon = $(this).children("longitude").text();
+				time = $(this).children("starttime").text();
+				address = $(this).children("address").text();
+			  
+				if ($(this).attr("type")!=null && $(this).attr("type").length > 0)
+				{
+					category = $(this).attr("type");
+				}
+				else
+				{
+					category = document.selectedCategory;
+				}
 
-        //console.debug(time);
-     	var dateEvent = new Date(time);
+					htmlString += "<span class='event_time'>"+  time + "</span><br/><br/>";
+					htmlString += "<span class='first_element'>Category:</span> &nbsp;<span class='event_category'>"+  category.charAt(0).toUpperCase() + category.slice(1)+"</span><br/>";
+					htmlString += "<span class='first_element'>Address:</span> &nbsp;"+ address + "<br/>";
+				
+					$(this).find("customvalue").each(function()
+					{
+						if ($(this).attr("value").length > 0)
+						{	
+							var customName = $(this).attr("name");
+							var customValue = $(this).attr("value");
+							var add_detail = true;
+							var detail = "<span class='first_element'>"+ customName.charAt(0).toUpperCase() + customName.slice(1) +": </span> &nbsp;" + customValue +"<br/>";
+							  
+							if (category == "phone" && customName == "type" && customValue== "out") 
+							{
+								detail = "<span class='first_element'>Type:</span> &nbsp; Outgoing call <br/>"
+							}
+							else if (category == "phone" && customName == "type" && customValue== "in") 
+							{
+								detail = "<span class='first_element'>Type:</span> &nbsp; Incoming call <br/>"
+							}
+							else if (category == "phone" && customName == "type" && customValue== "out_missed") 
+							{
+								detail = "<span class='first_element'>Type:</span> &nbsp; No answer call <br/>"
+							}
+							else  if (category == "phone" && customName == "type" && customValue== "in_missed") 
+							{
+								detail = "<span class='first_element'>Type:</span> &nbsp; Missed call <br/>"
+							}
+							else if (customName == "dursec")
+							{
+								add_detail = false;
+							}
+							  
+							if (add_detail)
+							{
+								htmlString = htmlString + detail;
+							}
+							
+							if (category == "application" && customName == "name")
+							{
+								app_name = customValue;
+							}
+							
+							if (category == "application" && customName == "dursec")
+							{
+								app_duration = customValue;
+							}
+						}
+					}); //end each custom value
+						
+			}
+		
+            //console.debug(time);
+     	    var dateEvent = new Date(time);
         
-        if (lat != "" && lon != "")
-		{
-			latLng = new google.maps.LatLng(parseFloat(lat), parseFloat(lon));
-			//add point to line
-			path.insertAt(0,latLng);
-			points.splice(0,0, latLng);
-			time_array.splice(0, 0, dateEvent);
-			//infoWindows.splice(0, 0, htmlString);
-		
-			
-			htmlString = "User id="+usr+" Time="+time;
-			var htmlStringFirst = htmlString;
-			
-			var pointIndex = checkPointExistance(latLng);
-			
-			if (pointIndex == -1 )
+            if (lat != "" && lon != "")
 			{
-				heat_points.push(latLng);
-				heat_infoWindows.push(htmlStringFirst);
-				user_points.push(usr);
+				latLng = new google.maps.LatLng(parseFloat(lat), parseFloat(lon));
+				//add point to line
+				path.insertAt(0,latLng);
+				points.splice(0,0, latLng);
+				time_array.splice(0, 0, dateEvent);
+				addresses.splice(0, 0, address);
+				infoWindows.splice(0, 0, htmlString);
+			
+				var htmlStringFirst = htmlString;
+				var pointIndex = checkPointExistance(latLng);
 				
-				//console.debug("heat_points.len:"+heat_points.length+"   user_points.len:"+user_points.length);
-				
-			}
-			else
-			{
-				AddDescriptionToInfoWindow(pointIndex, '<br/>'+htmlString);
-				
-			}
-		}
-		
-        if (prev_date == null)
-  			prev_date =  dateEvent;
-  				
-			//debugger;
-  			//check if the new event is in the same day 
-  			if (document.range == "m" || document.range == "w")
-  			{
-      			if (prev_date.getDate() == dateEvent.getDate() && 
-                prev_date.getMonth() == dateEvent.getMonth() &&
-                prev_date.getFullYear() == dateEvent.getFullYear() )                 
+				if (pointIndex == -1 )
 				{
+					heat_points.push(latLng);
+					heat_infoWindows.push(htmlStringFirst);
+				}
+				else
+				{
+					AddDescriptionToInfoWindow(pointIndex, '<br/>'+htmlString);
+				}
+			}
+			
+            if (prev_date == null)
+      			prev_date =  dateEvent;
+      				
+				//debugger;
+      			//check if the new event is in the same day 
+      			if (document.range == "m" || document.range == "w")
+      			{
+          			if (prev_date.getDate() == dateEvent.getDate() && 
+                    prev_date.getMonth() == dateEvent.getMonth() &&
+                    prev_date.getFullYear() == dateEvent.getFullYear() )                 
+					{
+						//the event is in the same day with the previous one
+						number_of_events = number_of_events + 1;
+						//push event into json object
+						var _month = dateEvent.getMonth() + 1;
+						fullDate = dateEvent.getDate() + "/" + _month + "/" + dateEvent.getFullYear();
+					
+						
+						if(prev_category == null)
+						{
+							_object.dates[iDate].date = fullDate;
+							_object.dates[iDate].dh = dateEvent.getDate();
+							_object.dates[iDate].category[iCat].name = category;
+							_object.dates[iDate].category[iCat]._event[0].latLong = latLng;
+							_object.dates[iDate].category[iCat]._event[0].htmlString = htmlString;
+							_object.dates[iDate].category[iCat]._event[0].dateEvent = dateEvent.getHours()+":"+dateEvent.getMinutes();
+							_object.dates[iDate].category[iCat]._event[0].app_name = app_name;
+							_object.dates[iDate].category[iCat]._event[0].duration = app_duration;
+							
+							
+							_object.dates[iDate].category[iCat].num_evt = 1;
+							prev_category = category;
+							
+						}
+						else if(prev_category == category)
+						{
+							var evt = {};
+							evt["latLong"] = latLng;
+							evt["htmlString"] = htmlString;
+							evt["dateEvent"] = dateEvent.getHours()+":"+dateEvent.getMinutes();
+							evt["app_name"] = app_name;
+							evt["duration"] = app_duration;
+							_object.dates[iDate].category[iCat]._event.push(evt);
+							_object.dates[iDate].category[iCat].num_evt = _object.dates[iDate].category[iCat]._event.length;
+							
+							
+						}
+						else
+						{
+							var evt = {};
+							evt["latLong"] = latLng;
+							evt["htmlString"] = htmlString;
+							evt["dateEvent"] = dateEvent.getHours()+":"+dateEvent.getMinutes();
+							evt["app_name"] = app_name;
+							evt["duration"] = app_duration;
+							//check if category already exists in array
+							var existing_cat_index = -1;
+							for (var v=0; v< _object.dates[iDate].category.length; v++)
+							{
+								if (_object.dates[iDate].category[v].name == category)
+								{
+									existing_cat_index = v;
+									iCat = v;
+									break;
+								}
+							}
+							if (existing_cat_index == -1)
+							{
+								var cat = {};
+								cat["name"] = category;
+								cat["_event"] = [];
+								cat["_event"].push(evt);
+								cat["num_evt"] = cat["_event"].length;
+								_object.dates[iDate].category.push(cat);
+								iCat++;
+							}
+							else
+							{
+								_object.dates[iDate].category[iCat]._event.push(evt);
+								_object.dates[iDate].category[iCat].num_evt = _object.dates[iDate].category[iCat]._event.length;
+							}
+							prev_category = category;
+						}
+					}                                      
+					else //The previous date is different from today
+					{
+						var evt = {};
+						evt["latLong"] = latLng;
+						evt["htmlString"] = htmlString;
+						evt["dateEvent"] = dateEvent.getHours()+":"+dateEvent.getMinutes();
+						evt["app_name"] = app_name;
+						evt["duration"] = app_duration;
+						var cat = {};
+						cat["name"] = category;
+						cat["_event"] = [];
+						cat["_event"].push(evt);
+						cat["num_evt"] = cat["_event"].length;
+						
+						var date = {};
+						date["date"] = dateEvent;
+						date["dh"]  = dateEvent.getDate();
+						date["category"] = [];
+						date["category"].push(cat);
+						_object.dates.push(date);
+						iDate+=1;
+						iCat=0;
+						
+						prev_category = category;
+						
+						
+						//Timeplot chart
+						timeplot_eventSource.push([prev_date, number_of_events]);
+						
+						//check max number of events
+						if (number_of_events > maxNumberOfEvents)
+							maxNumberOfEvents = number_of_events;
+						
+						prev_date = dateEvent;
+						number_of_events = 1;
+						
+						//create a new date in json
+					}
+				}
+				 else if (document.range == "d") 
+				{
+					if (prev_date.getHours() == dateEvent.getHours())
+					{
 					//the event is in the same day with the previous one
-					number_of_events = number_of_events + 1;
-					//push event into json object
-					var _month = dateEvent.getMonth() + 1;
-					fullDate = dateEvent.getDate() + "/" + _month + "/" + dateEvent.getFullYear();
-				
+					number_of_events = number_of_events + 1;		
 					
-					
-				}                                      
-				else //The previous date is different from today
-				{
-					/*var evt = {};
-					evt["latLong"] = latLng;
-					evt["htmlString"] = htmlString;
-					evt["dateEvent"] = dateEvent.getHours()+":"+dateEvent.getMinutes();
-					evt["app_name"] = app_name;
-					evt["duration"] = app_duration;
-					var cat = {};
-					cat["name"] = category;
-					cat["_event"] = [];
-					cat["_event"].push(evt);
-					cat["num_evt"] = cat["_event"].length;
-					
-					var date = {};
-					date["date"] = dateEvent;
-					date["dh"]  = dateEvent.getDate();
-					date["category"] = [];
-					date["category"].push(cat);
-					_object.dates.push(date);
-					iDate+=1;
-					iCat=0;*/
-					
-					prev_category = category;
-					
-					
-					//Timeplot chart
+					}                                          
+					else
+					{
 					timeplot_eventSource.push([prev_date, number_of_events]);
-					
 					//check max number of events
 					if (number_of_events > maxNumberOfEvents)
 						maxNumberOfEvents = number_of_events;
-					
+						
 					prev_date = dateEvent;
 					number_of_events = 1;
-					
-					//create a new date in json
+					}
 				}
-			}
-			 else if (document.range == "d") 
-			{
-				if (prev_date.getHours() == dateEvent.getHours())
-				{
-				//the event is in the same day with the previous one
-				number_of_events = number_of_events + 1;		
-				
-				}                                          
-				else
-				{
-				timeplot_eventSource.push([prev_date, number_of_events]);
-				//check max number of events
-				if (number_of_events > maxNumberOfEvents)
-					maxNumberOfEvents = number_of_events;
-					
-				prev_date = dateEvent;
-				number_of_events = 1;
-				}
-			}
-		 
+			 
   	  }); //end for each event
 
-	  //console.debug(_object);
+	  console.debug(_object);
       //add last date with the number of events
       if (prev_date != null)
       {
@@ -442,13 +541,10 @@ function addMarkersFromXML(xml) {
 //		markerClusterer = new MarkerClusterer(map, markers, {
 //		    maxZoom: null
 //		});
-	//if ($("#toggleheatmap").attr('checked'))
-    //{
-    if (!individual)
+	if ($("#toggleheatmap").attr('checked'))
     {
         addClusterMarkers();
     }
-    //}
   
   
       initializeTimeplot();
@@ -756,6 +852,7 @@ function displayAllMarkersOnMap()
    {
         clearPath();
         positionMarker.setMap(null);
+        //$("#infoBox").html("");
    }
    
    function reset()
@@ -880,58 +977,35 @@ function LinkMarkersToInfoWindows(markerIcon, size)
   	for(var i=0; i<heat_points.length; i++) 
   	{
   	    var markerImage = new google.maps.MarkerImage(markerIcon,size);
-  	    //var eventNumber =  heat_infoWindows[i].split("Category");
+  	    var eventNumber =  heat_infoWindows[i].split("Category");
   	
-		/*if (eventNumber.length >= 3)
-		{
-			markerImage = new google.maps.MarkerImage(imageUrlOrange,size);
-		}
+	      if (eventNumber.length >= 3)
+	      {
+             markerImage = new google.maps.MarkerImage(imageUrlOrange,size);
+        }
         
         if (eventNumber.length >= 5)
-	    {
+	      {
             markerImage = new google.maps.MarkerImage(imageUrlRed,size);
         }
-		*/
-		
+
   		  //debugger;
-  		  
   		  marker = null;
   		  p = null;
   		  var p = heat_points[i]; 
-  		  
-  		  if(individual)
-  		  {
-            markerImage = "http://chart.apis.google.com/chart?chst=d_map_pin_letter_withshadow&chld="+user_points[i].substring(3)+"|FFFF42|000000";
-            //markerImage = "http://chart.apis.google.com/chart?chst=d_map_spin&chld=1.1|0|FFFF42|10|b|"+user_points[i];
-            //console.debug("mark"+markerImage);
-            marker = new google.maps.Marker({
-  							 position: p,
-  							 icon: markerImage,
-  							 map : map
-  							 });
-  		  }
-  		  else
-  		  {
-            marker = new google.maps.Marker({
+  		  marker = new google.maps.Marker({
   							 position: p,
   							 icon: markerImage
   							 });
-          }
-  		  
-  		  
   		  displayInfo(i, marker);
   		  markers.push(marker);
     }
 }   
 
 function displayInfo(i, marker) {
-	   var infowindow = new google.maps.InfoWindow({
-            content: heat_infoWindows[i]
-        });
-
+	   
 	   google.maps.event.addListener(marker, 'click', function() {
-      		//$("#infoBox").html(heat_infoWindows[i]);
-      		infowindow.open(map,marker);
+      		$("#infoBox").html(heat_infoWindows[i]);
  	   });
 
 }
@@ -967,45 +1041,4 @@ function addClusterMarkers()
 		markerClusterer = new MarkerClusterer(map, markers, {
 		                        	 maxZoom: null
 		                   });
-}
-
-function setHomes(map, locations){
-	var home_image = new google.maps.MarkerImage('img/homes.png',
-      // This marker is 30 pixels wide by 30 pixels tall.
-      new google.maps.Size(30, 30),
-      // The origin for this image is 0,0.
-      new google.maps.Point(0,0),
-      // The anchor for this image is the base of the flagpole at 0,32.
-      new google.maps.Point(15, 30));
-	  
-	var work_image = new google.maps.MarkerImage('img/works.png',
-      // This marker is 30 pixels wide by 30 pixels tall.
-      new google.maps.Size(30, 30),
-      // The origin for this image is 0,0.
-      new google.maps.Point(0,0),
-      // The anchor for this image is the base of the flagpole at 0,32.
-      new google.maps.Point(15, 30));
-	  
-	for (var i = 0; i < locations.length; i++) {
-		var home = locations[i];
-		var myLatLng = new google.maps.LatLng(home[1], home[2]);
-		if(home[0] == 'Innopoli 2' || home[0] == 'Kielikeskus'){
-			var marker = new google.maps.Marker({
-			position: myLatLng,
-			map: map,
-			icon: work_image,
-			title: home[0],
-			zIndex: home[3]
-			});
-		};
-		if(home[0] != 'Innopoli 2' && home[0] != 'Kielikeskus'){
-			var marker = new google.maps.Marker({
-			position: myLatLng,
-			map: map,
-			icon: home_image,
-			title: home[0],
-			zIndex: home[3]
-			});
-		};
-  }
 }

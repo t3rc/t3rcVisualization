@@ -194,6 +194,11 @@ float:right;
 	margin:0px 50px 5px 50px;
 }
 
+#butts{
+	float:left;
+	width: 800px;
+}
+
 
 /* dataview */
 #detail_main { border: 1px solid #f00; width: 950px }
@@ -508,4 +513,12 @@ float:right;
 	height:100px;
 	font-size:14px;
 	background-color:#fff;
+}
+
+#chart_div{
+	float:left;
+	clear:both;
+	width:900px;
+	height:600px;
+	margin: 10px 0 0 15px;
 }

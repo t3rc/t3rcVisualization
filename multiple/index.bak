@@ -28,7 +28,6 @@
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script type="text/javascript" src="lib/cvmylife.functions.js"></script>
   	<script type="text/javascript" src="lib/maps.js"></script>
-	<script type="text/javascript" src="lib/gv.js"></script>
 
 	
   	<script type="text/javascript" src="lib/jquery.ui.accordion.min.js"></script>
@@ -47,6 +46,7 @@
 		<div id="maincontainer">
 			<div id="header">
 				<div id="help">
+                    <span id="settings_link" rel="#settings">Settings </span>
 					<span id="logoutscreenlink">Logout</span>
 				</div>
     		</div>
@@ -66,19 +66,19 @@
             </div>
             	<div id="content">
                  		<div id="my-timeplot" style="height: 200px; width:900px; float: left;"></div>
-						<div id="butts" class="buttons">
+						<img id="loading" src="img/loading.gif" style="display:none" />
+						<div class="buttons">
 							<div id="radio">
 							<form>
 									<input type="radio" id="Enable_All" name="radio" value="allevents" checked="checked" /><label for="Enable_All">Enable All</label>
 									<input type="radio" id="Enable_Location" name="radio" value="places" /><label for="Enable_Location">Location</label>
 									<input type="radio" id="Enable_Application" name="radio" value="application" /><label for="Enable_Application">Application</label>
-									<input type="radio" id="Enable_Browsing" name="radio" value="web" /><label for="Enable_Browsing">Websites</label>
-									<input type="radio" id="Enable_Messaging" name="radio" value="calendar" /><label for="Enable_Messaging">Calendar</label>
+									<input type="radio" id="Enable_Browsing" name="radio" value="browsing" /><label for="Enable_Browsing">Websites</label>
+									<input type="radio" id="Enable_Messaging" name="radio" value="messaging" /><label for="Enable_Messaging">Messaging</label>
 									<input type="radio" id="Enable_Phone" name="radio" value="phone" /><label for="Enable_Phone">Voice Call</label>
 							</form>
 							</div>							
             			   	<input type="checkbox" id="toggleheatmap" name="heatmap" checked="checked" /><label for="toggleheatmap">Heat Map</label>
-							<div id="loadingsec"><img id="loading" src="img/loading.gif" style="display:none" /></div>
 						</div>
 						<div id="mash-up-map"></div>
 						<div id="player">
@@ -91,8 +91,9 @@
                         	</div>
 							<div id="main_header"></div>
                   		</div>
-                        <div id="infoBox"></div>
-						<div id="chart_div"></div>
+                        <div id="infoBox">
+
+                        </div>
 						<div id="footer"></div>
                     </div>
 			</div>

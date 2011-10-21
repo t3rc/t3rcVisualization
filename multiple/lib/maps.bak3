@@ -250,7 +250,6 @@ function clearMarkersFromMap()
     }
 
 } 
-
  
 // Display Mash-up map with data filtered
 function addMarkersFromXML(xml) {

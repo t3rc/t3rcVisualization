@@ -504,6 +504,7 @@ function submitLogout () {
 				username = "";
 				password = "";
 				redraw();
+				
 		   }
 		});
 }
@@ -705,14 +706,6 @@ function showCategoryOnMap(){
 	});
 }
 
-function clearOverlays() {
-  if (markersArray) {
-    for (i in markersArray) {
-      markersArray[i].setMap(null);
-    }
-  }
-}
-
 function initJSON(){
 	_object = {"dates":
 	[{	"date":"",
@@ -746,7 +739,6 @@ $("#Enable_All").click(function(){
 		document.selectedCategory = $(this).val();
 		console.debug(document.selectedCategory);
 		individual = false;
-		clearOverlays();
 		redraw();
 });
 
@@ -754,7 +746,6 @@ $("#Enable_Individual").click(function(){
 		document.selectedCategory = $(this).val();
 		console.debug(document.selectedCategory);
 		individual = true;
-		clearOverlays();
 		redraw();
 });
 });
