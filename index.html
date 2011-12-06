@@ -4,6 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">	
 	
 	<script type="text/javascript" src="lib/jquery/jquery-1.5.1.min.js"></script>
+	<script type="text/javascript" src="lib/jquery/jquery-ui-1.8.16.custom.min.js"></script>
 	<script type="text/javascript" src="lib/jquery/scrollable.js"></script>
 	<script type="text/javascript" src="lib/jquery/overlay.js"></script>
 	<script type="text/javascript" src="lib/jquery/toolbox.expose.min.js"></script>
@@ -73,7 +74,8 @@
 									<input type="radio" id="Enable_Location" name="radio" value="places" /><label for="Enable_Location">Location</label>
 									<input type="radio" id="Enable_Application" name="radio" value="application" /><label for="Enable_Application">Application</label>
 									<input type="radio" id="Enable_Browsing" name="radio" value="web" /><label for="Enable_Browsing">Websites</label>
-									<input type="radio" id="Enable_Messaging" name="radio" value="calendar" /><label for="Enable_Messaging">Calendar</label>
+									<input type="radio" id="Enable_Calendar" name="radio" value="calendar" /><label for="Enable_Calendar">Calendar</label>
+									<input type="radio" id="Enable_Messaging" name="radio" value="messaging" /><label for="Enable_Messaging">Messages</label>
 									<input type="radio" id="Enable_Phone" name="radio" value="phone" /><label for="Enable_Phone">Voice Call</label>
 							</form>
 							</div>							
@@ -89,6 +91,10 @@
                                 <button type="button" id="nextbtn" class="button">Next</button>
                                 <button type="button" id="resetbtn" class="button">Reset</button>
                         	</div>
+							<div id="sliderholder">
+								<input id="amount" type="text">
+								<div id="slider"></div>
+							</div>
 							<div id="main_header"></div>
                   		</div>
                         <div id="infoBox"></div>
